@@ -1,6 +1,5 @@
 #include <errno.h>  /* errno */
-/*#include <stdarg.h> varargs */
-#include <stdio.h>  /* printf, fgets */
+#include <stdio.h>  /* printf, fgets, perror */
 #include <stdlib.h>  /* exit, atoi, getenv */
 #include <sys/types.h>  /* pid_t */
 #include <sys/wait.h>  /* waitpid */
@@ -72,7 +71,7 @@ int main() {
     pid = fork();
     /** If there is a fork failure... */
     if (pid < 0) {
-      fprintf(stderr, "Failed to fork: (%d) %s\n", errno, strerror(errno));
+      perror("Failed to fork");
     }
     /** If we are in the child process... */
     else if (pid == 0) {
@@ -84,7 +83,7 @@ int main() {
       else {
         /** If the file exists but is not executable, don't search for it. */
         if (errno == EACCES) {
-          fprintf(stderr, "File is not executable: %s\n", program_location);
+          perror("File is not executable");
           return 0;
         }
         /** If the file doesn't exist, iterate over each directory in PATH. */
@@ -104,7 +103,7 @@ int main() {
           else {
             /** If the file exists but is not executable, halt the search. */
             if (errno == EACCES) {
-              fprintf(stderr, "File is not executable: %s\n", temp_filename);
+              perror("File is not executable");
               break;
             }
           }
@@ -114,12 +113,15 @@ int main() {
         /** Execute the specified command line. */
         exec_result = execv(program_location, command_line);
         if (exec_result < 0) {
-          fprintf(stderr, "Failed to exec: (%d) %s\n", errno, strerror(errno));
+          perror("Failed to exec");
           /** The child process should terminate because no program was run. */
           /** TODO should we return a non-0 status if there was an exec
               error? */
           return 0;
         }
+      } else {
+        printf("File not found.\n");
+        return -1;
       }
     }
     /** If we are in the parent process... */
