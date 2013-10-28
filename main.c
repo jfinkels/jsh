@@ -1,9 +1,7 @@
-#include <ctype.h>  /* isspace */
 #include <errno.h>  /* errno */
 /*#include <stdarg.h> varargs */
 #include <stdio.h>  /* printf, fgets */
 #include <stdlib.h>  /* exit, atoi, getenv */
-#include <string.h>  /* strrchr */
 #include <sys/types.h>  /* pid_t */
 #include <sys/wait.h>  /* waitpid */
 #include <unistd.h>  /* fork, access */
