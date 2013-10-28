@@ -1,4 +1,4 @@
-#include <string.h>  /* strrchr */
+#include <string.h>  /* strrchr, size_t */
 
 #define PATHSEP '/'
 
