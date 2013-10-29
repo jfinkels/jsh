@@ -1,4 +1,5 @@
 #include <errno.h>  /* errno */
+#include <stdbool.h>  /* bool */
 #include <stdio.h>  /* printf, fgets, perror */
 #include <stdlib.h>  /* exit, atoi, getenv */
 #include <sys/types.h>  /* pid_t */
@@ -19,14 +20,15 @@ int main() {
   int exit_status;
   int child_status;
   int access_status;
-  int file_found;
-  int i;
+  bool file_found = false;
   size_t argc;
+  size_t i;
   size_t path_length;
   pid_t pid;
   char raw_input[COMMAND_LINE_LENGTH];
   char * command_line[MAX_SPLIT];
   char * path[PATH_LENGTH];
+  char * env_path;
   char program_location[COMMAND_LINE_LENGTH];
   char temp_filename[COMMAND_LINE_LENGTH];
 
@@ -78,7 +80,7 @@ int main() {
       /** Check if the program location is executable. */
       access_status = access(program_location, X_OK);
       if (access_status == 0) {
-        file_found = 1;
+        file_found = true;
       }
       else {
         /** If the file exists but is not executable, don't search for it. */
@@ -86,25 +88,29 @@ int main() {
           perror("File is not executable");
           return 0;
         }
-        /** If the file doesn't exist, iterate over each directory in PATH. */
-        path_length = split(path, getenv("PATH"), ":");
-        for (i = 0; i < path_length; i++) {
-          /** Join the program name with the PATH directory. */
-          join(temp_filename, path[i], command_line[0]);
-          /** Check if the program location is executable. */
-          access_status = access(temp_filename, X_OK);
-          if (access_status == 0) {
-            /** Store the path to the program in program_location. */
-            strncpy(program_location, temp_filename, strlen(temp_filename));
-            program_location[strlen(temp_filename)] = '\0';
-            file_found = 1;
-            break;
-          }
-          else {
-            /** If the file exists but is not executable, halt the search. */
-            if (errno == EACCES) {
-              perror("File is not executable");
+          /** If the file doesn't exist, iterate over each directory in PATH,
+              if PATH is not empty. */
+        env_path = getenv("PATH");
+        if (env_path != NULL) {
+          path_length = split(path, env_path, ":");
+          for (i = 0; i < path_length; i++) {
+            /** Join the program name with the PATH directory. */
+            join(temp_filename, path[i], command_line[0]);
+            /** Check if the program location is executable. */
+            access_status = access(temp_filename, X_OK);
+            if (access_status == 0) {
+              /** Store the path to the program in program_location. */
+              strncpy(program_location, temp_filename, strlen(temp_filename));
+              program_location[strlen(temp_filename)] = '\0';
+              file_found = true;
               break;
+            }
+            else {
+              /** If the file exists but is not executable, halt the search. */
+              if (errno == EACCES) {
+                perror("File is not executable");
+                break;
+              }
             }
           }
         }
@@ -120,7 +126,7 @@ int main() {
           return 0;
         }
       } else {
-        printf("File not found.\n");
+        printf("%s: command not found.\n", command_line[0]);
         return -1;
       }
     }
@@ -129,6 +135,6 @@ int main() {
       /** Wait until the child process terminates and store its exit status. */
       wait(&child_status);
     }
-  } while (1);
+  } while (true);
   return 0;
 }

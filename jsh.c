@@ -1,3 +1,4 @@
+#include <stdbool.h>  /* bool */
 #include <string.h>  /* strrchr, size_t */
 
 #define PATHSEP '/'
@@ -27,7 +28,7 @@ size_t split(char ** result, char * string, const char * delimiters) {
 /**
  * Returns a non-zero value if and only if `string` ends with character `c`.
  */
-int endswith(char * string, char c) {
+static bool endswith(char * string, char c) {
   size_t length = strlen(string);
   return string[length - 1] == c;
 }
