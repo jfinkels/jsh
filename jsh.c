@@ -13,7 +13,7 @@
  *
  * Returns the number of strings that were created from the split.
  */
-size_t split(char ** result, char * string, char * delimiters) {
+size_t split(char ** result, char * string, const char * delimiters) {
   size_t j = 0;
   char * token = strtok(string, delimiters);
   while (token != NULL) {
@@ -29,7 +29,7 @@ size_t split(char ** result, char * string, char * delimiters) {
  */
 int endswith(char * string, char c) {
   size_t length = strlen(string);
-  return string[length] == c;
+  return string[length - 1] == c;
 }
 
 
@@ -46,6 +46,7 @@ void join(char * result, char * dirname, char * basename) {
   strncpy(result + dirname_length + 1, basename, basename_length);
   result[dirname_length + basename_length + 1] = '\0';
 }
+
 
 /**
  * Sets `result` to be the basename of the specified path.
