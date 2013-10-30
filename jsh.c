@@ -14,7 +14,9 @@
  *
  * Returns the number of strings that were created from the split.
  */
-size_t split(char ** result, char * string, const char * delimiters) {
+size_t
+split (char ** result, char * string, const char * delimiters)
+{
   size_t j = 0;
   char * token = strtok(string, delimiters);
   while (token != NULL) {
@@ -28,13 +30,30 @@ size_t split(char ** result, char * string, const char * delimiters) {
 /**
  * Returns a non-zero value if and only if `string` ends with character `c`.
  */
-static bool endswith(char * string, char c) {
+static bool
+endswith (char * string, char c)
+{
   size_t length = strlen(string);
   return string[length - 1] == c;
 }
 
 
-void join(char * result, char * dirname, char * basename) {
+bool
+starts_with (char * string, char * initial)
+{
+  size_t i;
+  for (i = 0; i < strlen(initial); i++) {
+    if (string[i] != initial[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+void
+join (char * result, char * dirname, char * basename)
+{
   size_t dirname_length;
   size_t basename_length;
   dirname_length = strlen(dirname);
@@ -54,7 +73,9 @@ void join(char * result, char * dirname, char * basename) {
  *
  * `path` is a path (for example `/usr/bin/make`).
  */
-void basename(char * result, char * path) {
+void
+basename (char * result, char * path)
+{
   char * base;
   size_t length;
   /** Find the last occurrence of the path separator. */
